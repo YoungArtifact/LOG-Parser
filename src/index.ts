@@ -5,7 +5,20 @@ const file = Bun.file("src/log.txt")
 let fileAsString = await file.text()
 let lines = fileAsString.split("\n")
 
-let doc
+let baseHtml = `
+<html lang="en">
+  <head>
+      <title>Log Parser</title>
+  </head>
+  <body>
+    <table>
+      <tr>
+        <th>TIME</th>
+        <th>LEVEL</th>
+        <th>SCREEN</th>
+        <th>SUBJECT</th>
+        <th>MESSAGE</th>
+      </tr>`
 
 for(let line in lines) {
   let tempLine = lines[line]
@@ -15,26 +28,32 @@ for(let line in lines) {
   let time = tempLine_split[1]
   let level = tempLine_split[2]
   let screen = tempLine_split[3]
-  let message = tempLine_split[4]
-
-  console.log(tempLine_split)
-
+  let subject = tempLine_split[4]
+  let message = tempLine_split[5]
 
   
-  lines[line] = tempLine
+  let tempLine_list = {time: time, level: level, screen: screen, subject: subject, message: message}
+  
+  console.log(tempLine_split)
+
+  // lines[line] = tempLine
+
+  baseHtml += `
+      <tr>
+        <td>` + tempLine_list.time + `</td>` +
+        `<td>` + tempLine_list.level + `</td>` +
+        `<td>` + tempLine_list.screen + `</td>` +
+        `<td>` + tempLine_list.subject + `</td>` +
+        `<td>` + tempLine_list.message + `</td>
+      </tr>`
 }
 
-let combinedLines = lines.join("<br />")
-
-const app = new Elysia().use(html()).get("/", () =>`
-<html lang="en">
-  <head>
-      <title>Log Parser</title>
-  </head>
-  <body>` 
-    + combinedLines +
-  `</body>
+baseHtml += `
+    </table>
+  </body>
 </html>`
+
+const app = new Elysia().use(html()).get("/", ({ html }) => html(baseHtml)
 
 ).listen(3000);
 
