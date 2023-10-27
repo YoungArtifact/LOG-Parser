@@ -15,36 +15,60 @@ let baseHtml = `
       <tr>
         <th>TIME</th>
         <th>LEVEL</th>
-        <th>SCREEN</th>
         <th>SUBJECT</th>
         <th>MESSAGE</th>
       </tr>`
 
+let tempLine_list = []
+let tempLine_listLength = 0
+
 for(let line in lines) {
-  let tempLine = lines[line]
-  // seperating each line into time, level, screen and message
-  let tempLine_split = tempLine.split(/^\[(?<time>\d\d[:\.]\d\d[:\.]\d\d) (?<level>[a-z]+)(?: +screen_(?<screen>\d+))? +(?<modName>[^\]]+)\]/i)
-  
-  let time = tempLine_split[1]
-  let level = tempLine_split[2]
-  let screen = tempLine_split[3]
-  let subject = tempLine_split[4]
-  let message = tempLine_split[5]
+  let tempLine = lines[Number(line)]
+  let prevLine = lines[Number(line) - 1]
 
-  
-  let tempLine_list = {time: time, level: level, screen: screen, subject: subject, message: message}
-  
-  console.log(tempLine_split)
+  //* skip line if it is empty
+  if (tempLine.length == 0) {
+    continue
+  }
 
-  // lines[line] = tempLine
+  //* add lines without intro to previous message
+  if (tempLine.startsWith(" ")) {
+    // while (prevLine.startsWith(" ")) {
+    //   let prevCount = 1
+    //   prevLine = lines[Number(line) - prevCount]
+    //   prevCount + 1
+    // }
 
+    console.log(tempLine_list[tempLine_listLength])
+
+    // tempLine_list[tempLine_listLength].message += prevLine
+  } else {
+    //* seperating each line into time, level, screen and message
+    let tempLine_split = tempLine.split(/^\[(?<time>\d\d[:\.]\d\d[:\.]\d\d) (?<level>[a-z]+)(?: +screen_(?<screen>\d+))? +(?<modName>[^\]]+)\]/i)
+    
+    let time = tempLine_split[1]
+    let level = tempLine_split[2]
+    let screen = tempLine_split[3]
+    let subject = tempLine_split[4]
+    let message = tempLine_split[5]
+  
+    let tempLine_object = {time: time, level: level, screen: screen, subject: subject, message: message}
+    
+    // console.log(tempLine_split)
+  
+    tempLine_listLength = tempLine_list.push(tempLine_object)
+  }
+}
+
+//* write lines to html
+for (let tl in tempLine_list) {
+  let tempLine_object = tempLine_list[tl]
   baseHtml += `
       <tr>
-        <td>` + tempLine_list.time + `</td>` +
-        `<td>` + tempLine_list.level + `</td>` +
-        `<td>` + tempLine_list.screen + `</td>` +
-        `<td>` + tempLine_list.subject + `</td>` +
-        `<td>` + tempLine_list.message + `</td>
+        <td>` + tempLine_object.time + `</td>` +
+        `<td>` + tempLine_object.level + `</td>` +
+        `<td>` + tempLine_object.subject + `</td>` +
+        `<td>` + tempLine_object.message + `</td>
       </tr>`
 }
 
