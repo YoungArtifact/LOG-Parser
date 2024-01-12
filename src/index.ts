@@ -1,7 +1,7 @@
 import { Elysia } from "elysia";
 import { html } from "@elysiajs/html"
 
-const file = Bun.file("src/log.txt")
+const file = Bun.file("src/SMAPI log (3c6dfdde99be46f291e9d1a6502dfb25).txt")
 let fileAsString = await file.text()
 let lines = fileAsString.split("\n")
 
@@ -25,6 +25,8 @@ let tempLine_listLength = 0
 for(let line in lines) {
   let tempLine = lines[Number(line)]
   let prevLine = lines[Number(line) - 1]
+  let nextLine = lines[Number(line) + 1]
+  let wholeLine : String = ""
 
   //* skip line if it is empty
   if (tempLine.length == 0) {
@@ -32,32 +34,50 @@ for(let line in lines) {
   }
 
   //* add lines without intro to previous message
-  if (tempLine.startsWith(" ")) {
-    // while (prevLine.startsWith(" ")) {
-    //   let prevCount = 1
-    //   prevLine = lines[Number(line) - prevCount]
-    //   prevCount + 1
-    // }
+  wholeLine = tempLine
 
-    console.log(tempLine_list[tempLine_listLength])
 
-    // tempLine_list[tempLine_listLength].message += prevLine
-  } else {
-    //* seperating each line into time, level, screen and message
-    let tempLine_split = tempLine.split(/^\[(?<time>\d\d[:\.]\d\d[:\.]\d\d) (?<level>[a-z]+)(?: +screen_(?<screen>\d+))? +(?<modName>[^\]]+)\]/i)
-    
-    let time = tempLine_split[1]
-    let level = tempLine_split[2]
-    let screen = tempLine_split[3]
-    let subject = tempLine_split[4]
-    let message = tempLine_split[5]
-  
-    let tempLine_object = {time: time, level: level, screen: screen, subject: subject, message: message}
-    
-    // console.log(tempLine_split)
-  
-    tempLine_listLength = tempLine_list.push(tempLine_object)
+  let nextCount = 1
+  while (nextLine.startsWith(" ")) {
+    nextLine = lines[Number(line) + nextCount]
+    nextCount++
+    tempLine = tempLine + "<br />" + nextLine
+    wholeLine = tempLine
   }
+
+  // if (nextLine.startsWith(" ")) {
+  //   // while (nextLine.startsWith(" ")) {
+  //   //   let nextCount = 1
+  //   //   nextLine = lines[Number(line) - nextCount]
+  //   //   nextCount + 1
+  //   // }
+
+  //   // console.log(tempLine, nextLine)
+
+  //   wholeLine = tempLine + nextLine
+  //   // tempLine_list[tempLine_listLength].message += nextLine
+  // } else {
+  //   wholeLine = tempLine
+  // }
+  
+  //* seperating each line into time, level, screen and message
+  let tempLine_split = wholeLine.split(/^\[(?<time>\d\d[:\.]\d\d[:\.]\d\d) (?<level>[a-z]+)(?: +screen_(?<screen>\d+))? +(?<modName>[^\]]+)\]/i)
+
+  if (tempLine_split[1] == undefined) {
+    continue
+  }
+
+  let time = tempLine_split[1]
+  let level = tempLine_split[2]
+  let screen = tempLine_split[3]
+  let subject = tempLine_split[4]
+  let message = tempLine_split[5]
+
+  let tempLine_object = {time: time, level: level, subject: subject, message: message}
+  
+  // console.log(tempLine_split)
+
+  tempLine_listLength = tempLine_list.push(tempLine_object)
 }
 
 //* write lines to html
