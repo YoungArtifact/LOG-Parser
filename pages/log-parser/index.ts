@@ -37,7 +37,6 @@ export default async function logParser() {
     //* add lines without intro to previous message
     wholeLine = tempLine
   
-  
     let nextCount = 1
     while (nextLine.startsWith(" ")) {
       nextLine = lines[Number(line) + nextCount]
@@ -45,22 +44,7 @@ export default async function logParser() {
       tempLine = tempLine + "<br />" + nextLine
       wholeLine = tempLine
     }
-  
-    // if (nextLine.startsWith(" ")) {
-    //   // while (nextLine.startsWith(" ")) {
-    //   //   let nextCount = 1
-    //   //   nextLine = lines[Number(line) - nextCount]
-    //   //   nextCount + 1
-    //   // }
-  
-    //   // console.log(tempLine, nextLine)
-  
-    //   wholeLine = tempLine + nextLine
-    //   // tempLine_list[tempLine_listLength].message += nextLine
-    // } else {
-    //   wholeLine = tempLine
-    // }
-    
+
     //* seperating each line into time, level, screen and message
     let tempLine_split = wholeLine.split(/^\[(?<time>\d\d[:\.]\d\d[:\.]\d\d) (?<level>[a-z]+)(?: +screen_(?<screen>\d+))? +(?<modName>[^\]]+)\]/i)
   
